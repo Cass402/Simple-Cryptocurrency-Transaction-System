@@ -6,8 +6,6 @@ blockchain and contains methods to add blocks to the blockchain, validate the bl
 import hashlib # for hashing the blocks using SHA-256
 import json # for encoding the blocks to JSON format
 from time import time # for timestamping the blocks
-from urllib.parse import urlparse # for parsing the URLs of the nodes in the network
-import requests # for sending HTTP requests to the nodes in the network
 
 # Block class
 class Block: 
@@ -70,9 +68,8 @@ class Blockchain:
         return True # return True if the blockchain is valid
     
     # method to add a new node to the network
-    def add_node(self, address):
-        parsed_url = urlparse(address) # parse the URL of the node
-        self.nodes.add(parsed_url.netloc) # add the node to the set of nodes
+    def add_node(self, node):
+        self.nodes.add(node) # add the node to the set of nodes in the network
 
     # method to resolve conflicts in the blockchain by reaching consensus among the nodes
     def resolve_conflicts(self):
@@ -81,10 +78,8 @@ class Blockchain:
 
         # iterate over the nodes in the network
         for node in self.nodes:
-            response = requests.get(f'http://{node}/chain') # send a GET request to the node to get its blockchain
-            if response.status_code == 200: # if the request is successful
-                length = response.json()['length'] # get the length of the blockchain from the response
-                chain = response.json()['chain'] # get the blockchain from the response
+                chain = node.blockchain.chain # get the blockchain of the node
+                length = len(chain) # get the length of the blockchain
 
                 # check if the length of the blockchain is greater than the current length and the blockchain is valid
                 if length > max_length and self.validate_chain(chain):
