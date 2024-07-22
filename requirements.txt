@@ -1,0 +1,5 @@
+#This file should contain a list of all the libraries that your code depends on, and they will be installed using:
+#pip install -r requirements.txt
+
+# Right now, the libraries being used are default libraries that come with Python.
+# No explicit installation is required.

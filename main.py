@@ -13,9 +13,9 @@ def main():
     blockchain = Blockchain()
 
     # create nodes in the network
-    node_Alice = Node('Alice') # create a node with name 'Alice'
-    node_Bob = Node('Bob') # create a node with name 'Bob'
-    node_Charlie = Node('Charlie') # create a node with name 'Charlie'
+    node_Alice = Node('Alice', blockchain) # create a node with name 'Alice'
+    node_Bob = Node('Bob', blockchain) # create a node with name 'Bob'
+    node_Charlie = Node('Charlie', blockchain) # create a node with name 'Charlie'
 
     # create a list of nodes
     nodes = [node_Alice, node_Bob, node_Charlie]
@@ -37,6 +37,27 @@ def main():
     
     # print the blockchain
     for block in blockchain.chain:
+        print(block)
+
+    # update the chain of one of the nodes to simulate a conflict and resolve it (for demonstration purposes)
+    node_Alice.simulate_transactions(nodes) # simulate transactions for Alice
+    node_Alice.mine_block() # mine a block for Alice
+    #delete the last block of the blockchain
+    blockchain.chain.pop()
+
+    # call the resolve_conflicts method to resolve the conflict
+    if blockchain.resolve_conflicts():
+        print('Conflict resolved!')
+    else:
+        print('Conflict not resolved!')
+    
+    # print the blockchain after resolving the conflict
+    for block in blockchain.chain:
+        print(block)
+    
+    print("Alice's chain after resolving the conflict:")
+    # print the chain of Alice after resolving the conflict
+    for block in node_Alice.chain:
         print(block)
     
 

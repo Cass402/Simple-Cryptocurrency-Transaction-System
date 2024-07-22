@@ -48,14 +48,18 @@ class Blockchain:
     def add_block(self, data):
         previous_block = self.chain[-1] # get the last block in the blockchain
         new_block = self.create_block(previous_block['index'] + 1, previous_block['hash'], data) # create a new block with a index incremented by 1, previous hash as the hash of the previous block and the given data
+        for node in self.nodes: # iterate over the nodes in the network
+            node.update_blockchain() # update the blockchain of each node to synchronize the network
         return new_block # return the new block
     
     # method to validate the blockchain
-    def validate_chain(self):
+    def validate_chain(self, chain=None):
+        if chain is None: # if no chain is provided
+            chain = self.chain # use the current chain of the blockchain
         # iterate over the blocks in the blockchain starting from the second block (ignoring the genesis block)
-        for index in range(1, len(self.chain)):
-            current_block = self.chain[index] # get the current block
-            previous_block = self.chain[index - 1] # get the previous block
+        for index in range(1, len(chain)):
+            current_block = chain[index] # get the current block
+            previous_block = chain[index - 1] # get the previous block
 
             # check if the hash of the current block is valid (to ensure the integrity of the block in the blockchain)
             if current_block['hash'] != current_block.calculate_hash():
@@ -78,7 +82,7 @@ class Blockchain:
 
         # iterate over the nodes in the network
         for node in self.nodes:
-                chain = node.blockchain.chain # get the blockchain of the node
+                chain = node.chain # get the chain of the node
                 length = len(chain) # get the length of the blockchain
 
                 # check if the length of the blockchain is greater than the current length and the blockchain is valid

@@ -9,19 +9,20 @@ import random # for generating random numbers
 
 # Node class
 class Node:
-    def __init__(self, name):
+    def __init__(self, name, blockchain):
         self.name = name # the name of the node
         if (Blockchain.validate_chain): # validate the blockchain before copying it to the node (to ensure the integrity of the blockchain)
-            self.chain = Blockchain() # create a copy of the blockchain for the node
+            self.chain = blockchain.chain.copy() # copy the blockchain to the node
+            self.blockchain = blockchain # reference to the blockchain
         else: # if the blockchain is not valid
             raise Exception('Blockchain is not valid!') # raise an exception
         self.transactions = [] # a list to store the transactions in the node
-        Blockchain.add_node(self) # add the node to the network
+        blockchain.add_node(self) # add the node to the blockchain
     
     # method to create a new transaction
     def create_transaction(self, receiver, amount):
         transaction = Transaction(self.name, receiver, amount) # create a new transaction with the sender as the node's name
-        return transaction # return the transaction
+        return transaction.to_dict() # return the transaction as a dictionary
     
     # method to simulate transactions between nodes for demonstration purposes
     def simulate_transactions(self, nodes):
@@ -35,10 +36,16 @@ class Node:
     
     # method to mine a block in the blockchain
     def mine_block(self):
-        block = self.blockchain.add_block(self.transactions) # add the transactions in the node to the blockchain and mine the block
-        self.chain.append(block) # append the block to the blockchain of the node
+        block = self.blockchain.add_block(self.transactions) # add the transactions to the blockchain and mine a new block
+        self.chain.append(block) # add the block to the node's chain
         self.transactions = [] # clear the transactions in the node after mining the block
         print(f'{self.name} mined a new block with index {block.index} and hash {block.hash}') # print a message that the block has been mined
+    
+    # method to update the blockchain of the node after the original blockchain is updated
+    def update_blockchain(self):
+        self.chain = self.blockchain.chain.copy() # copy the updated blockchain to the node
+        print(f'{self.name} updated the blockchain') # print a message that the blockchain has been updated
+    
         
     
     

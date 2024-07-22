@@ -55,11 +55,13 @@ The [`Blockchain`](blockchain.py) class manages the chain of blocks. It initiali
 
 ## Transactions
 
-Transactions represent the transfer of cryptocurrency between parties. They are implemented in [`transaction.py`](transaction.py) and include the sender, receiver, amount, and timestamp. Transactions are the data part of the blocks in the blockchain.
+Transactions represent the transfer of cryptocurrency between parties. They are implemented in [`transaction.py`](transaction.py) and include the sender, receiver, amount, and timestamp. Transactions are the data part of the blocks in the blockchain. The Transaction class also contains a
+method to export the transaction details in a dictionary format.
 
 ## Network Nodes
 
-The system also includes a network of nodes, represented as a set within the `Blockchain` class. These nodes are crucial for the decentralized nature of the blockchain, allowing for the distribution and verification of the chain across multiple participants.
+The system also includes a network of nodes, represented as a set within the `Blockchain` class. These nodes are crucial for the decentralized nature of the blockchain, allowing for the distribution and verification of the chain across multiple participants. The [`node.py`](node.py) file includes data on
+the nodes of the network like their names, their own copy of the blockchain. The `simulate_transactions` method simulates real-world like transactions of public blockchains and the nodes then put them in a block and mine them with the POW algorithm to append the block to the blockchain.
 
 ## Proof of Work
 
