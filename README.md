@@ -19,7 +19,12 @@ This project uses a virtual Python environment to localize dependencies. Follow 
 
    - With the virtual environment activated, install the project dependencies by running `pip install -r requirements.txt`.
 
-4. **Deactivate the virtual environment** (when done working on the project):
+4. **Run the application**:
+
+   - With the virtual environment set up, run the application by typing `python3 main.py`.
+   - Your terminal will show the output of the application which is the simulation of the blockchain.
+
+5. **Deactivate the virtual environment** (when done working on the project):
    - Run `deactivate` to exit the virtual environment.
 
 # How the Application Works
@@ -66,6 +71,10 @@ the nodes of the network like their names, their own copy of the blockchain. The
 ## Proof of Work
 
 To add a new block to the chain, a proof-of-work algorithm is employed. This algorithm requires finding a value (nonce) that, when hashed with the block's contents, produces a hash that meets certain criteria (e.g., a specific number of leading zeros). This process secures the network and prevents tampering with the blockchain.
+
+## Conflict resolution
+
+To simulate a conflict resolution, after the initial transaction and blocks have been mined and the blockchain has been displayed, the node_Alice will simulate a few more transactions and mine a block only to its own blockchain after which the `resolve_conflicts` method will be called to update the blockchain to adopt the chain which has the most proof of work. This will make the blockchain adopt node_Alice's blockchain as the main chain for the application.
 
 ## Summary
 

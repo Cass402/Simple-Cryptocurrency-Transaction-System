@@ -9,17 +9,20 @@ from time import time # for timestamping the blocks
 
 # Block class
 class Block: 
-    def __init__(self, index, timestamp, data, previous_hash):
+    def __init__(self, index, timestamp, data, previous_hash, nonce=None):
         self.index = index # the index of the block in the blockchain
         self.timestamp = timestamp # the timestamp of the block when it was created
         self.data = data # the data that the block contains (e.g., transactions)
         self.previous_hash = previous_hash # the hash of the previous block in the blockchain
-        self.nonce = 0 # the nonce value used for proof of work
+        if nonce is None: # if no nonce value is provided
+            self.nonce = 0 # set the nonce value to 0
+        else: # if a nonce value is provided
+            self.nonce = nonce
         self.hash = self.calculate_hash() # the hash of the current block
 
     # method to calculate the hash of the current block
     def calculate_hash(self):
-        block_string = json.dumps(self.__dict__, sort_keys=True) # encode the block with its instance variables in dictionary format to JSON format
+        block_string = json.dumps({'index': self.index, 'timestamp': self.timestamp, 'data': self.data, 'previous_hash': self.previous_hash, 'nonce': self.nonce}, sort_keys=True) # encode the block to JSON format and sort the keys
         return hashlib.sha256(block_string.encode()).hexdigest() # hash the block using SHA-256 and return the value of hash in hexadecimal format
     
     # method to perform proof of work and mine the block
@@ -28,6 +31,11 @@ class Block:
         while self.hash[:difficulty] != target_difficulty: # repeat the process until the hash of the block has the required number of leading zeros
             self.nonce += 1 # increment the nonce value to change the hash of the block
             self.hash = self.calculate_hash() # calculate the hash of the block with the new nonce value
+
+    # method to convert the block dictionary back to a Block object
+    @classmethod # decorator to define a class method
+    def from_dict(cls, block_dict):
+        return cls(block_dict['index'], block_dict['timestamp'], block_dict['data'], block_dict['previous_hash']) # return a new Block object with the values from the block dictionary
     
 # Blockchain class
 class Blockchain:
@@ -41,7 +49,7 @@ class Blockchain:
     def create_block(self, index, previous_hash, data):
         block = Block(index, time(), data, previous_hash) # create a new block with the given index, timestamp, data and previous hash
         block.proof_of_work(self.difficulty) # mine the block using proof of work to find the valid hash
-        self.chain.append(block.__dict__) # add the block to the blockchain
+        self.chain.append(block.__dict__) # add the block to the blockchain as a dictionary
         return block # return the block
     
     # method to add a new block to the blockchain
@@ -58,15 +66,18 @@ class Blockchain:
             chain = self.chain # use the current chain of the blockchain
         # iterate over the blocks in the blockchain starting from the second block (ignoring the genesis block)
         for index in range(1, len(chain)):
-            current_block = chain[index] # get the current block
-            previous_block = chain[index - 1] # get the previous block
+            current_block_dict = chain[index] # get the current block as a dictionary
+            previous_block_dict = chain[index - 1] # get the previous block as a dictionary
+            current_block = Block.from_dict(current_block_dict) # convert the current block dictionary to a Block object
+            previous_block = Block.from_dict(previous_block_dict) # convert the previous block dictionary to a Block object
+            current_block.proof_of_work(self.difficulty) # mine the current block to validate the hash
 
             # check if the hash of the current block is valid (to ensure the integrity of the block in the blockchain)
-            if current_block['hash'] != current_block.calculate_hash():
+            if current_block_dict['hash'] != current_block.hash:
                 return False
             
             # check if the previous hash of the current block matches the hash of the previous block (to ensure the continuity of the blockchain)
-            if current_block['previous_hash'] != previous_block['hash']:
+            if current_block_dict['previous_hash'] != previous_block.hash:
                 return False
             
         return True # return True if the blockchain is valid
@@ -86,10 +97,10 @@ class Blockchain:
                 length = len(chain) # get the length of the blockchain
 
                 # check if the length of the blockchain is greater than the current length and the blockchain is valid
-                if length > max_length and self.validate_chain(chain):
+                if length > max_length:
                     max_length = length # update the maximum length
-                    new_chain = chain
-        
+                    new_chain = chain # update the new chain
+                
         if new_chain: # if a new chain is found (not None)
             self.chain = new_chain # update the blockchain with the new chain
             return True # return True if the blockchain is updated and conflicts are resolved
